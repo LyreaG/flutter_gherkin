@@ -73,7 +73,7 @@ class WidgetTesterAppDriverAdapter
   }
 
   Future<List<int>> takeScreenshotUsingRenderElement() async {
-    RenderObject? renderObject = binding.renderViewElement?.renderObject;
+    RenderObject? renderObject = binding.rootElement?.renderObject;
     if (renderObject != null) {
       while (!renderObject!.isRepaintBoundary) {
         renderObject = renderObject.parent as RenderObject?;
