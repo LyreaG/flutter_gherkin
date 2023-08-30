@@ -84,24 +84,18 @@ abstract class GherkinIntegrationTestRunner {
   }
 
   Future<void> run() async {
-    _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    _binding.framePolicy = framePolicy ?? _binding.framePolicy;
-    NativeAutomatorConfig nativeAutomatorConfig = const NativeAutomatorConfig();
-
-    if (true) {
-      switch (bindingType) {
-        case BindingType.patrol:
-          _nativeAutomator = NativeAutomator(config: nativeAutomatorConfig);
-          _binding = PatrolBinding.ensureInitialized();
-          _binding.framePolicy = framePolicy ?? _binding.framePolicy;
-          break;
-        case BindingType.integrationTest:
-          _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-          _binding.framePolicy = framePolicy ?? _binding.framePolicy;
-          break;
-        case BindingType.none:
-          break;
-      }
+    switch (bindingType) {
+      case BindingType.patrol:
+        _nativeAutomator = NativeAutomator(config: nativeAutomatorConfig);
+        _binding = PatrolBinding.ensureInitialized();
+        _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+        break;
+      case BindingType.integrationTest:
+        _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+        _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+        break;
+      case BindingType.none:
+        break;
     }
 
     tearDownAll(
