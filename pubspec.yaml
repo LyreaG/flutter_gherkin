@@ -22,6 +22,7 @@ dependencies:
   source_gen: ^1.1.1
   build: ^2.1.1
   glob: ^2.0.2
+  patrol: ^2.2.3
 
 dev_dependencies:
   meta: '>=1.7.0 < 2.0.0'

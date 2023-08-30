@@ -1,5 +1,6 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
+import 'package:patrol/patrol.dart';
 
 import '../adapters/app_driver_adapter.dart';
 
@@ -11,6 +12,15 @@ class FlutterWorld extends World {
 
   /// The adapter that is used to agnostically drive the app under test
   AppDriverAdapter get appDriver => _adapter!;
+
+  /// Native automator from Patrol
+  NativeAutomator? _nativeAutomator;
+
+  NativeAutomator? get nativeAutomator => _nativeAutomator;
+
+  void setNativeAutomator(NativeAutomator? nativeAutomator) {
+    _nativeAutomator = _nativeAutomator;
+  }
 
   /// Sets the app driver that is used to control the app under test
   void setAppAdapter(AppDriverAdapter appAdapter) {

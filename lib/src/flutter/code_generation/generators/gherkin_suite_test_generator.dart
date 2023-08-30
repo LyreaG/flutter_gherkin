@@ -35,12 +35,16 @@ class _CustomGherkinIntegrationTestRunner extends GherkinIntegrationTestRunner {
     required Timeout scenarioExecutionTimeout,
     AppLifecyclePumpHandlerFn? appLifecyclePumpHandler,
     LiveTestWidgetsFlutterBindingFramePolicy? framePolicy,
+    BindingType bindingType = BindingType.integrationTest,
+    NativeAutomatorConfig nativeAutomatorConfig = const NativeAutomatorConfig(),
   }) : super(
           configuration: configuration,
           appMainFunction: appMainFunction,
           scenarioExecutionTimeout: scenarioExecutionTimeout,
           appLifecyclePumpHandler: appLifecyclePumpHandler,
           framePolicy: framePolicy,
+          bindingType: bindingType,
+          nativeAutomatorConfig: nativeAutomatorConfig,
         );
 
   @override

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:collection/collection.dart';
+import 'package:patrol/patrol.dart';
 
 enum AppLifecyclePhase {
   initialisation,
@@ -40,11 +41,14 @@ abstract class GherkinIntegrationTestRunner {
   final Timeout scenarioExecutionTimeout;
   final LiveTestWidgetsFlutterBindingFramePolicy? framePolicy;
   final AggregatedReporter _reporter = AggregatedReporter();
+  final BindingType bindingType;
+  final NativeAutomatorConfig nativeAutomatorConfig;
 
   late final Iterable<ExecutableStep>? _executableSteps;
   late final Iterable<CustomParameter>? _customParameters;
   late final Hook? _hook;
   late final IntegrationTestWidgetsFlutterBinding _binding;
+  NativeAutomator? _nativeAutomator;
 
   AggregatedReporter get reporter => _reporter;
   Hook get hook => _hook!;
@@ -65,6 +69,8 @@ abstract class GherkinIntegrationTestRunner {
     required this.scenarioExecutionTimeout,
     this.appLifecyclePumpHandler,
     this.framePolicy,
+    this.bindingType = BindingType.integrationTest,
+    this.nativeAutomatorConfig = const NativeAutomatorConfig(),
   }) {
     configuration.prepare();
     _registerReporters(configuration.reporters);
@@ -79,8 +85,24 @@ abstract class GherkinIntegrationTestRunner {
 
   Future<void> run() async {
     _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
     _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+    NativeAutomatorConfig nativeAutomatorConfig = const NativeAutomatorConfig();
+
+    if (true) {
+      switch (bindingType) {
+        case BindingType.patrol:
+          _nativeAutomator = NativeAutomator(config: nativeAutomatorConfig);
+          _binding = PatrolBinding.ensureInitialized();
+          _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+          break;
+        case BindingType.integrationTest:
+          _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+          _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+          break;
+        case BindingType.none:
+          break;
+      }
+    }
 
     tearDownAll(
       () async {
@@ -301,15 +323,17 @@ abstract class GherkinIntegrationTestRunner {
     world = world ?? FlutterWidgetTesterWorld();
     world.setAttachmentManager(attachmentManager);
 
-    (world as FlutterWorld).setAppAdapter(
-      WidgetTesterAppDriverAdapter(
-        rawAdapter: tester,
-        binding: _binding,
-        waitImplicitlyAfterAction: configuration is FlutterTestConfiguration
-            ? (configuration).waitImplicitlyAfterAction
-            : true,
-      ),
-    );
+    (world as FlutterWorld)
+      ..setAppAdapter(
+        WidgetTesterAppDriverAdapter(
+          rawAdapter: tester,
+          binding: _binding,
+          waitImplicitlyAfterAction: configuration is FlutterTestConfiguration
+              ? (configuration).waitImplicitlyAfterAction
+              : true,
+        ),
+      )
+      ..setNativeAutomator(_nativeAutomator);
 
     return TestDependencies(
       world,
