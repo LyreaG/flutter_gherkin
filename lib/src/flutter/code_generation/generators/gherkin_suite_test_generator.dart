@@ -61,6 +61,8 @@ Future<void> executeTestSuite({
   Timeout scenarioExecutionTimeout = const Timeout(const Duration(minutes: 10)),
   AppLifecyclePumpHandlerFn? appLifecyclePumpHandler,
   LiveTestWidgetsFlutterBindingFramePolicy? framePolicy,
+  BindingType bindingType = BindingType.integrationTest,
+  NativeAutomatorConfig nativeAutomatorConfig = const NativeAutomatorConfig(),
 }) =>
     _CustomGherkinIntegrationTestRunner(
       configuration: configuration,
@@ -68,6 +70,8 @@ Future<void> executeTestSuite({
       appLifecyclePumpHandler: appLifecyclePumpHandler,
       scenarioExecutionTimeout: scenarioExecutionTimeout,
       framePolicy: framePolicy,
+      bindingType: bindingType,
+      nativeAutomatorConfig: nativeAutomatorConfig,
     ).run();
 ''';
   final _reporter = NoOpReporter();
