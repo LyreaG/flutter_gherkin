@@ -48,7 +48,6 @@ abstract class GherkinIntegrationTestRunner {
   late final Iterable<CustomParameter>? _customParameters;
   late final Hook? _hook;
   late final IntegrationTestWidgetsFlutterBinding _binding;
-  NativeAutomator? _nativeAutomator;
 
   AggregatedReporter get reporter => _reporter;
   Hook get hook => _hook!;
@@ -84,19 +83,8 @@ abstract class GherkinIntegrationTestRunner {
   }
 
   Future<void> run() async {
-    switch (bindingType) {
-      case BindingType.patrol:
-        _nativeAutomator = NativeAutomator(config: nativeAutomatorConfig);
-        _binding = PatrolBinding.ensureInitialized();
-        _binding.framePolicy = framePolicy ?? _binding.framePolicy;
-        break;
-      case BindingType.integrationTest:
-        _binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-        _binding.framePolicy = framePolicy ?? _binding.framePolicy;
-        break;
-      case BindingType.none:
-        break;
-    }
+    _binding = PatrolBinding.ensureInitialized();
+    _binding.framePolicy = framePolicy ?? _binding.framePolicy;
 
     tearDownAll(
       () async {
@@ -191,9 +179,11 @@ abstract class GherkinIntegrationTestRunner {
     Future<void> Function()? onAfter,
   }) {
     if (_evaluateTagFilterExpression(configuration.tagExpression, tags)) {
-      testWidgets(
+      patrolTest(
         name,
-        (WidgetTester tester) async {
+        bindingType: bindingType,
+        nativeAutomatorConfig: nativeAutomatorConfig,
+        (PatrolIntegrationTester tester) async {
           if (onBefore != null) {
             await onBefore();
           }
@@ -216,7 +206,7 @@ abstract class GherkinIntegrationTestRunner {
             );
 
             await startApp(
-              tester,
+              tester.tester,
               dependencies.world,
             );
 
@@ -273,7 +263,7 @@ abstract class GherkinIntegrationTestRunner {
             // need to pump so app can finalise
             await _appLifecyclePhasePumper(
               AppLifecyclePhase.finalisation,
-              tester,
+              tester.tester,
             );
 
             await cleanUpScenarioRun(dependencies);
@@ -304,7 +294,7 @@ abstract class GherkinIntegrationTestRunner {
   @protected
   Future<TestDependencies> createTestDependencies(
     TestConfiguration configuration,
-    WidgetTester tester,
+    PatrolIntegrationTester tester,
   ) async {
     World? world;
     final attachmentManager =
@@ -320,14 +310,14 @@ abstract class GherkinIntegrationTestRunner {
     (world as FlutterWorld)
       ..setAppAdapter(
         WidgetTesterAppDriverAdapter(
-          rawAdapter: tester,
+          rawAdapter: tester.tester,
           binding: _binding,
           waitImplicitlyAfterAction: configuration is FlutterTestConfiguration
               ? (configuration).waitImplicitlyAfterAction
               : true,
         ),
       )
-      ..setNativeAutomator(_nativeAutomator);
+      ..setPatrolIntegrationTester(tester);
 
     return TestDependencies(
       world,

@@ -13,13 +13,14 @@ class FlutterWorld extends World {
   /// The adapter that is used to agnostically drive the app under test
   AppDriverAdapter get appDriver => _adapter!;
 
-  /// Native automator from Patrol
-  NativeAutomator? _nativeAutomator;
+  /// PatrolIntegrationTester from Patrol
+  PatrolIntegrationTester? _patrolIntegrationTester;
 
-  NativeAutomator? get nativeAutomator => _nativeAutomator;
+  PatrolIntegrationTester? get patrolIntegrationTester =>
+      _patrolIntegrationTester;
 
-  void setNativeAutomator(NativeAutomator? nativeAutomator) {
-    _nativeAutomator = _nativeAutomator;
+  void setPatrolIntegrationTester(PatrolIntegrationTester? nativeAutomator) {
+    _patrolIntegrationTester = nativeAutomator;
   }
 
   /// Sets the app driver that is used to control the app under test
