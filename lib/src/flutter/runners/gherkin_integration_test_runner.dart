@@ -83,8 +83,19 @@ abstract class GherkinIntegrationTestRunner {
   }
 
   Future<void> run() async {
-    _binding = PatrolBinding.ensureInitialized();
-    _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+    switch (bindingType) {
+      case BindingType.patrol:
+        _binding = PatrolBinding.ensureInitialized();
+        _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+        break;
+      case BindingType.integrationTest:
+        IntegrationTestWidgetsFlutterBinding.ensureInitialized().framePolicy =
+            framePolicy ?? _binding.framePolicy;
+
+        break;
+      case BindingType.none:
+        break;
+    }
 
     tearDownAll(
       () async {
