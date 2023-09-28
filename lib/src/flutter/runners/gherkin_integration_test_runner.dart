@@ -68,7 +68,7 @@ abstract class GherkinIntegrationTestRunner {
     required this.scenarioExecutionTimeout,
     this.appLifecyclePumpHandler,
     this.framePolicy,
-    this.bindingType = BindingType.integrationTest,
+    this.bindingType = BindingType.patrol,
     this.nativeAutomatorConfig = const NativeAutomatorConfig(),
   }) {
     configuration.prepare();
@@ -200,6 +200,21 @@ abstract class GherkinIntegrationTestRunner {
             await onBefore();
           }
           bool failed = false;
+
+          switch (bindingType) {
+            case BindingType.patrol:
+              _binding = PatrolBinding.ensureInitialized();
+              _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+              break;
+            case BindingType.integrationTest:
+              _binding =
+                  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+              _binding.framePolicy = framePolicy ?? _binding.framePolicy;
+
+              break;
+            case BindingType.none:
+              break;
+          }
 
           final debugInformation = RunnableDebugInformation(path, 0, name);
           final scenarioTags = (tags ?? const Iterable<Tag>.empty()).map(
