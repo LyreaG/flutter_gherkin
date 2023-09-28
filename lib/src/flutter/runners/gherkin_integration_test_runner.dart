@@ -193,6 +193,7 @@ abstract class GherkinIntegrationTestRunner {
       patrolTest(
         name,
         bindingType: bindingType,
+        nativeAutomation: true,
         nativeAutomatorConfig: nativeAutomatorConfig,
         (PatrolIntegrationTester tester) async {
           if (onBefore != null) {
